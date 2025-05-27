@@ -5,3 +5,8 @@ sudo apt install tightvncserver
 sudo apt install xrdp
 sudo ufw status
 sudo ufw allow 22
+
+git config --global user.name "Ghostfacexx"
+git config --global user.email "ognyan.gh@gmail.com"
+echo "https://Ghostfacexx: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@github.com" > ~/.git-credentials
+git config --global credential.helper store
