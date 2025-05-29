@@ -11,3 +11,4 @@ git config --global user.email "ognyan.gh@gmail.com"
 echo "https://Ghostfacexx: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@github.com" > ~/.git-credentials
 git config --global credential.helper store
 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
+sudo apt install -y xfce4 xfce4-goodies
