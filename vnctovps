@@ -1,0 +1,51 @@
+#!/bin/bash
+
+# Step 1: Generate SSH key if it doesn't exist (no passphrase for automation)
+if [ ! -f ~/.ssh/id_rsa ]; then
+    ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa -N ""
+fi
+
+# Step 2: Copy the public key to the VPS (requires password the first time)
+# Note: If this fails, you’ll need to manually enter the VPS password or ensure the key is already copied
+ssh-copy-id -f root@159.65.219.188 || {
+    echo "Failed to copy SSH key. Please manually copy ~/.ssh/id_rsa.pub to the VPS's ~/.ssh/authorized_keys"
+    exit 1
+}
+
+# Step 3: Start the autossh SOCKS5 proxy in the background
+# First, kill any existing autossh processes to avoid conflicts
+pkill -f "autossh -M 0 -D 8888 -N root@159.65.219.188"
+nohup autossh -M 0 -D 8888 -N root@159.65.219.188 &
+
+# Step 4: Configure system-wide proxy settings in ~/.bashrc
+# Remove any existing proxy settings to avoid duplicates
+sed -i '/export http_proxy=/d' ~/.bashrc
+sed -i '/export https_proxy=/d' ~/.bashrc
+sed -i '/export all_proxy=/d' ~/.bashrc
+
+# Add the proxy settings
+echo 'export http_proxy="socks5://127.0.0.1:8888"' >> ~/.bashrc
+echo 'export https_proxy="socks5://127.0.0.1:8888"' >> ~/.bashrc
+echo 'export all_proxy="socks5://127.0.0.1:8888"' >> ~/.bashrc
+
+# Apply the changes
+source ~/.bashrc
+
+# Step 5: Verify the proxy is running
+if ss -tuln | grep -q 8888; then
+    echo "SOCKS5 proxy is running on port 8888"
+else
+    echo "Failed to start SOCKS5 proxy. Check nohup.out for errors"
+    exit 1
+fi
+
+# Step 6: Verify traffic routing
+IP=$(curl -s http://ifconfig.me)
+if [ "$IP" = "159.65.219.188" ]; then
+    echo "Traffic successfully routed through VPS (159.65.219.188)"
+else
+    echo "Traffic routing failed. Current IP: $IP"
+    exit 1
+fi
+
+echo "Setup complete! Configure GUI apps (e.g., Firefox) to use SOCKS5 proxy at 127.0.0.1:8888"
