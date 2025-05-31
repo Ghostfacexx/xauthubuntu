@@ -1,0 +1,16 @@
+sudo bash -c 'cat > /etc/xrdp/startwm.sh << EOF
+#!/bin/bash
+export XDG_CURRENT_DESKTOP=XFCE
+export XDG_CONFIG_DIRS=/etc/xdg/xfce4:/etc/xdg
+export XDG_DATA_DIRS=/usr/share/xfce4:/usr/local/share:/usr/share
+startxfce4
+EOF'
+sudo chmod +x /etc/xrdp/startwm.sh
+sudo apt update && sudo apt install -y pipewire pipewire-pulse pulseaudio-utils
+sudo -u belo mkdir -p /home/belo/.config/autostart
+echo "[Desktop Entry]\nHidden=true" | sudo -u belo tee /home/belo/.config/autostart/light-locker.desktop
+sudo chown -R belo:belo /home/belo/.config
+sudo rm -f /home/belo/.Xauthority
+sudo -u belo touch /home/belo/.Xauthority
+sudo chown belo:belo /home/belo/.Xauthority
+sudo apt update && sudo apt install -y xfce4 xfce4-goodies xorg
