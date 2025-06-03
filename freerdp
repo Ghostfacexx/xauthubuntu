@@ -1,0 +1,4 @@
+sudo apt install -y freerdp2-x11
+xfreerdp /u:root /p:your_root_password /v:127.0.0.1 /size:1920x1080
+sudo cat /var/log/xrdp.log
+sudo cat /var/log/xrdp-sesman.log
